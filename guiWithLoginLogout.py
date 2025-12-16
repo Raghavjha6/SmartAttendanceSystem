@@ -9,9 +9,7 @@ import mysql.connector
 import shutil
 from openpyxl import Workbook
 
-# -----------------------------
 # Database Connection
-# -----------------------------
 db = mysql.connector.connect(
     host="localhost",
     user="root",
@@ -20,9 +18,7 @@ db = mysql.connector.connect(
 )
 cursor = db.cursor()
 
-# -----------------------------
 # Admin Login Class
-# -----------------------------
 class AdminLogin:
     def __init__(self, root):
         self.root = root
@@ -60,9 +56,7 @@ class AdminLogin:
             messagebox.showerror("Error", "Invalid username or password")
 
 
-# -----------------------------
 # Main App Class
-# -----------------------------
 class AttendanceApp:
     def __init__(self, root, admin_name):
         self.root = root
@@ -70,11 +64,9 @@ class AttendanceApp:
         self.root.title(f"Smart Attendance System - Logged in as {admin_name}")
         self.root.geometry("1000x800")
 
-        # Video Frame
         self.video_label = tk.Label(self.root)
         self.video_label.pack()
 
-        # Buttons
         ttk.Button(self.root, text="Start Attendance", command=self.start_attendance).pack(pady=5)
         ttk.Button(self.root, text="Stop Attendance", command=self.stop_attendance).pack(pady=5)
         ttk.Button(self.root, text="Manage Students", command=self.manage_students).pack(pady=5)
@@ -82,15 +74,12 @@ class AttendanceApp:
         ttk.Button(self.root, text="Export Today's Attendance", command=self.export_today_attendance).pack(pady=5)
         ttk.Button(self.root, text="Export Attendance (Custom Range)", command=self.export_range_attendance).pack(pady=5)
 
-        # NEW Logout Button
         ttk.Button(self.root, text="Logout", command=self.logout).pack(pady=20)
 
         self.cap = None
         self.running = False
 
-    # -----------------------------
     # Logout Function
-    # -----------------------------
     def logout(self):
         self.stop_attendance()
         messagebox.showinfo("Logout", f"Goodbye, {self.admin_name}!")
@@ -99,9 +88,7 @@ class AttendanceApp:
         AdminLogin(new_root)
         new_root.mainloop()
 
-    # -----------------------------
     # Load known faces
-    # -----------------------------
     def load_known_faces(self):
         self.known_faces = []
         self.known_names = []
@@ -113,10 +100,8 @@ class AttendanceApp:
                 if encoding:
                     self.known_faces.append(encoding[0])
                     self.known_names.append(name)
-
-    # -----------------------------
+                    
     # Start Attendance
-    # -----------------------------
     def start_attendance(self):
         self.load_known_faces()
         self.cap = cv2.VideoCapture(0)
@@ -164,19 +149,15 @@ class AttendanceApp:
 
         self.root.after(10, self.video_stream)
 
-    # -----------------------------
     # Stop Attendance
-    # -----------------------------
     def stop_attendance(self):
         self.running = False
         if self.cap:
             self.cap.release()
         cv2.destroyAllWindows()
 
-    # -----------------------------
     # Mark Attendance (first + last time)
-    # -----------------------------
-    def mark_attendance(self, student_name):
+        def mark_attendance(self, student_name):
         cursor.execute("SELECT id FROM students WHERE name=%s", (student_name,))
         result = cursor.fetchone()
         if not result:
@@ -196,9 +177,7 @@ class AttendanceApp:
                            (student_id, today, now_time, now_time))
         db.commit()
 
-    # -----------------------------
     # View Attendance
-    # -----------------------------
     def view_attendance(self):
         top = tk.Toplevel(self.root)
         top.title("Attendance Records")
@@ -218,9 +197,8 @@ class AttendanceApp:
         for row in cursor.fetchall():
             tree.insert("", "end", values=row)
 
-    # -----------------------------
+    
     # Export Functions
-    # -----------------------------
     def export_today_attendance(self):
         today = date.today()
         cursor.execute("""
@@ -285,9 +263,7 @@ class AttendanceApp:
 
         ttk.Button(top, text="Export", command=export).grid(row=2, column=0, columnspan=2, pady=10)
 
-    # -----------------------------
     # Manage Students
-    # -----------------------------
     def manage_students(self):
         top = tk.Toplevel(self.root)
         top.title("Student Management")
@@ -361,10 +337,9 @@ class AttendanceApp:
         ttk.Button(form_frame, text="Delete Student", command=delete_student).grid(row=1, column=2, pady=10)
 
 
-# -----------------------------
 # Run the App
-# -----------------------------
 if __name__ == "__main__":
     root = tk.Tk()
     AdminLogin(root)
     root.mainloop()
+
